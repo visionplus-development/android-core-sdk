@@ -2,18 +2,19 @@
 
 ## Setup
 ### Step 1. Add the JitPack repository to your build file
-Add it in your root build.gradle at the end of repositories:
+Add it in your build.gradle (root) at the end of repositories:
 ```groovy
-	allprojects {
-		repositories {
-			...
-			maven { url 'https://jitpack.io' }
-		}
+allprojects {
+	repositories {
+		...
+		maven { url 'https://jitpack.io' }
 	}
+}
 ```
 ### Step 2. Add the dependency
+Add it in your build.gradle (app):
 ```groovy
-	dependencies {
-	        implementation 'com.github.visionplus-development:android-core-sdk:$latest_version'
-	}
+dependencies {
+	implementation 'com.github.visionplus-development:android-core-sdk:$latest_version'
+}
 ```
