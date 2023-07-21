@@ -1,4 +1,12 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven { url "https://jitpack.io" }
+    }
+}
+
 plugins {
     id 'com.android.application' version '8.0.2' apply false
     id 'com.android.library' version '8.0.2' apply false
@@ -8,9 +16,14 @@ plugins {
 allprojects {
     apply plugin: 'maven-publish'
 
+    project.ext {
+        appVersionString = "0.3.0" //String
+        appVersionCode = 1 //Integer
+    }
+
     ext {
         groupId = 'id.visionplus'
-        versionId = '0.2.0'
+        versionId = '0.3.0-SNAPSHOT'
         gitProjectUrl = ""
         gitUrl = ""
     }
