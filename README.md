@@ -18,3 +18,19 @@ dependencies {
 	implementation 'com.github.visionplus-development:android-core-sdk:$latest_version'
 }
 ```
+
+
+### Step 3. Usage
+
+```kotlin
+        val c = CoreVideo("USER TOKEN","DEVICE ID",20)
+
+        c.listener = object : CoreVideoListener {
+            override fun onLimitedDeviceError(code: Int, message: String) {
+                TODO("Not yet implemented")
+            }
+        }
+
+        // Release when usage are done or when activity is destroyed
+        c.release()
+```
