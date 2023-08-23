@@ -15,16 +15,21 @@ import id.visionplus.coresdk.CoreVideoListener
 import id.visionplus.videocore.ui.theme.VideoCoreTheme
 
 class MainActivity : ComponentActivity() {
+    lateinit var c: CoreVideo
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val c = CoreVideo(
-            deviceID = ""
+        c = CoreVideo(
+            token = "",
+            deviceID = "",
+            intervalInSecond = 60,
+            isDebug = false,
+            limitedDeviceBaseUrl = ""
         )
 
-        c.release()
+
         c.listener = object : CoreVideoListener {
             override fun onLimitedDeviceError(code: Int, message: String) {
-                TODO("Not yet implemented")
+                c.release()
             }
         }
 
@@ -40,6 +45,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        c.release()
     }
 }
 

@@ -1,20 +1,20 @@
 package id.visionplus.coresdk
 
 import android.util.Log
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.engine.android.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
-import kotlinx.coroutines.GlobalScope
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.coroutines.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 interface CoreVideoListener {
     fun onLimitedDeviceError(code: Int, message: String)
 }
-
 
 class CoreVideo(
     var token: String = "",
@@ -25,20 +25,24 @@ class CoreVideo(
 ) {
     var listener: CoreVideoListener? = null
     private var heartbeatJob: Job? = null
-    private val client = HttpClient()
+    private val client = HttpClient(Android) {
+        install(ContentNegotiation) {
+            json()
+        }
+    }
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     init {
         runHeartbeatEveryN()
     }
 
     private fun runHeartbeatEveryN() {
-        heartbeatJob = GlobalScope.launch(Dispatchers.IO) {
-            while (true) { // isActive is a property of CoroutineScope.
+        heartbeatJob = coroutineScope.launch {
+            while (true) {
                 reportLimitedDevice()
-                delay(intervalInSecond.toLong() * 1000) //
+                delay(intervalInSecond.toLong() * 1000)
             }
         }
-
     }
 
     private suspend fun reportLimitedDevice() {
@@ -47,12 +51,17 @@ class CoreVideo(
                 Log.d("CoreVideo", "Making Limited Device Report")
             }
 
-            // TODO: Change to real url and value
-            // Make a http call
             val url = limitedDeviceBaseUrl ?: "https://web-api.visionplus.id/api/v1/visitor"
-            val payload = mapOf("token" to token, "deviceID" to deviceID)
-            val response = client.get(url) {
-                contentType(ContentType.Application.Json)
+            val response: ApiResponse = client.get(url) {
+                headers {
+                    append("device-id", deviceID)
+                    append("Authorization", token)
+                    contentType(ContentType.Application.Json)
+                }
+            }.body()
+
+            if(response.statusCode != 200){
+                listener?.onLimitedDeviceError(response.statusCode, response.message)
             }
 
             if (isDebug) {
@@ -65,7 +74,24 @@ class CoreVideo(
 
     fun release() {
         heartbeatJob?.cancel()
+        coroutineScope.cancel() // Cancel the CoroutineScope when releasing the CoreVideo instance
     }
-
-
 }
+
+@Serializable
+data class UserData(
+    @SerialName("user_type")
+    val userType: String,
+    @SerialName("max_play")
+    val maxPlay: Int
+)
+
+@Serializable
+data class ApiResponse(
+    @SerialName("data")
+    val data: UserData,
+    @SerialName("status_code")
+    val statusCode: Int,
+    @SerialName("message")
+    val message: String
+)
