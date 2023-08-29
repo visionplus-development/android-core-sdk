@@ -35,8 +35,6 @@ android {
 }
 
 dependencies {
-    implementation 'com.google.android.exoplayer:exoplayer:2.19.0'
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.19.0'
     def ktor_version = '2.3.2'
     implementation "io.ktor:ktor-client-android:$ktor_version"
     implementation "io.ktor:ktor-client-core:$ktor_version"
