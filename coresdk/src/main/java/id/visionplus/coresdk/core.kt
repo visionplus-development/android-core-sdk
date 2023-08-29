@@ -13,7 +13,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 interface CoreVideoListener {
-    fun onLimitedDeviceError(code: Int, message: String)
+    fun onFirstHeartbeatReceived(code: Int, message: String) // success: start player, failure: show message limit
+    fun onHeartbeatReceived(code: Int, message: String) // success: do nothing, failure: show message limit
 }
 
 class CoreVideo(
@@ -25,6 +26,7 @@ class CoreVideo(
 ) {
     var listener: CoreVideoListener? = null
     private var heartbeatJob: Job? = null
+    private var heartbeatCount: Long = 0
     private val client = HttpClient(Android) {
         install(ContentNegotiation) {
             json()
@@ -32,20 +34,19 @@ class CoreVideo(
     }
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-    init {
-        runHeartbeatEveryN()
-    }
-
     private fun runHeartbeatEveryN() {
+        if (heartbeatJob != null) {
+            return
+        }
         heartbeatJob = coroutineScope.launch {
             while (true) {
-                reportLimitedDevice()
+                reportLimitedDevice(heartbeatCount)
                 delay(intervalInSecond.toLong() * 1000)
             }
         }
     }
 
-    private suspend fun reportLimitedDevice() {
+    private suspend fun reportLimitedDevice(heartbeatCount: Long) {
         try {
             if (isDebug) {
                 Log.d("CoreVideo", "Making Limited Device Report")
@@ -60,38 +61,49 @@ class CoreVideo(
                 }
             }.body()
 
-            if(response.statusCode != 200){
-                listener?.onLimitedDeviceError(response.statusCode, response.message)
-            }
+            handleHeartbeat(heartbeatCount, response.statusCode ?: 0, response.message ?: "Unknown error")
 
             if (isDebug) {
                 Log.d("CoreVideo", "reportLimitedDevice: $response")
             }
         } catch (e: Exception) {
-            listener?.onLimitedDeviceError(0, e.message ?: "Unknown error")
+            handleHeartbeat(heartbeatCount, 0, e.message ?: "Unknown error")
         }
     }
 
-    fun release() {
+    private fun handleHeartbeat(heartbeatCount: Long, code: Int, message: String) {
+        if (heartbeatCount < 1) {
+            listener?.onFirstHeartbeatReceived(code, message)
+        } else {
+            listener?.onHeartbeatReceived(code, message)
+        }
+    }
+
+    fun stop() {
         heartbeatJob?.cancel()
         coroutineScope.cancel() // Cancel the CoroutineScope when releasing the CoreVideo instance
+        heartbeatCount = 0
+    }
+
+    fun start() {
+        runHeartbeatEveryN()
     }
 }
 
 @Serializable
 data class UserData(
     @SerialName("user_type")
-    val userType: String,
+    val userType: String?,
     @SerialName("max_play")
-    val maxPlay: Int
+    val maxPlay: Int?
 )
 
 @Serializable
 data class ApiResponse(
     @SerialName("data")
-    val data: UserData,
+    val data: UserData?,
     @SerialName("status_code")
-    val statusCode: Int,
+    val statusCode: Int?,
     @SerialName("message")
-    val message: String
+    val message: String?
 )

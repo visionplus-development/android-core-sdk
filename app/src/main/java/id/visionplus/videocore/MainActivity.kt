@@ -28,11 +28,31 @@ class MainActivity : ComponentActivity() {
 
 
         c.listener = object : CoreVideoListener {
-            override fun onLimitedDeviceError(code: Int, message: String) {
-                c.release()
+            override fun onFirstHeartbeatReceived(code: Int, message: String) {
+                when (code) {
+                    403 -> {
+                        // tendang user
+                    }
+                    else -> {
+                        // play player
+                    }
+                }
+            }
+
+            override fun onHeartbeatReceived(code: Int, message: String) {
+                when (code) {
+                    403 -> {
+                        // tendang user
+                    }
+                    else -> {
+                        // do nothing
+                    }
+                }
             }
         }
 
+        c.start()
+        c.stop()
 
         setContent {
             VideoCoreTheme {
@@ -49,7 +69,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        c.release()
+        c.stop()
     }
 }
 
