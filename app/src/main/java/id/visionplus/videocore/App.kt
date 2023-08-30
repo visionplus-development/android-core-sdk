@@ -26,7 +26,7 @@ class App: Application() {
         VisionPlusCore.setCoreModuleConfig(
             CoreModuleConfig.Device(
                 heartbeatIntervalMs = 5000, // 5 sec
-                url = "https://stag2-device.visionplus.id/api/v1/device-management/concurrent-play" // full url
+                url = "URL" // full url
             )
         )
 
@@ -36,7 +36,7 @@ class App: Application() {
         * */
         VisionPlusCore.setGlobalConfig(
             config = GlobalConfig(
-                deviceId = "38c309dbb175333f8f47a78fc2317dc5", // required
+                deviceId = "DEVICE ID", // required
                 token = "", // we can define token later
             )
         )

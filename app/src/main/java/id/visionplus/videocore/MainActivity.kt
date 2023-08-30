@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        VisionPlusCore.updateToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaG1hZC5odWRhQHZpc2lvbnBsdXMuaWQiLCJhYmlsaXRpZXMiOltdLCJ1aWQiOjY5MTIyNzQxLCJyYW5kb20iOiJmMjNlZGMzNjdjYjE1MTNlIiwiZXhwIjoxNjk1ODgzODQ4LCJwbCI6ImFuZHJvaWQiLCJkZXZpY2VfaWQiOiIzOGMzMDlkYmIxNzUzMzNmOGY0N2E3OGZjMjMxN2RjNSJ9.7mkURo3I5MoaKd76dCpilnhU1BshB-lPeESZoanbOdU ")
+        VisionPlusCore.updateToken("USER TOKEN")
 
         coreDeviceManager = VisionPlusCore.getDeviceManager()
 
