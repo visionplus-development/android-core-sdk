@@ -1,9 +1,11 @@
 package id.visionplus.coresdk.features.device
 
+import androidx.core.util.Consumer
 import id.visionplus.coresdk.features.config.ConfigManager
-import id.visionplus.coresdk.features.device.model.DeviceLimitState
+import id.visionplus.coresdk.features.device.model.ConcurrentPlayState
 import id.visionplus.coresdk.features.device.repository.DeviceRepository
 import kotlinx.coroutines.*
+import kotlinx.coroutines.Runnable
 
 internal class DeviceManagerImpl(
     private val configManager: ConfigManager,
@@ -12,10 +14,23 @@ internal class DeviceManagerImpl(
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
     private var heartbeatJob: Job? = null
 
-    private var onFirstHeartbeatReceived: ((DeviceLimitState) -> Unit)? = null
-    private var onContinuousHeartbeatReceived: ((DeviceLimitState) -> Unit)? = null
+    private var onFirstHeartbeatCallback: Consumer<ConcurrentPlayState>? = null
+    private var onContinuousHeartbeatCallback: Consumer<ConcurrentPlayState>? = null
+    private var onStopHeartbeatCallback: Runnable? = null
 
-    private fun startHeartBeat() {
+    override fun setOnFirstHeartbeatCallback(callback: Consumer<ConcurrentPlayState>) {
+        onFirstHeartbeatCallback = callback
+    }
+
+    override fun setOnContinuousHeartbeatCallback(callback: Consumer<ConcurrentPlayState>) {
+        onContinuousHeartbeatCallback = callback
+    }
+
+    override fun setOnStopHeartbeatCallback(callback: Runnable) {
+        onStopHeartbeatCallback = callback
+    }
+
+    override fun start() {
         if (heartbeatJob != null) {
             return
         }
@@ -24,34 +39,23 @@ internal class DeviceManagerImpl(
 
         heartbeatJob = coroutineScope.launch {
             /* First Heartbeat */
-            var state = repository.checkDeviceLimit()
-            onFirstHeartbeatReceived?.invoke(state)
+            var state = repository.checkConcurrentPlay()
+            onFirstHeartbeatCallback?.accept(state)
             delay(interval)
 
             /* Continuous Heartbeat */
             while (true) {
-                state = repository.checkDeviceLimit()
-                onContinuousHeartbeatReceived?.invoke(state)
+                state = repository.checkConcurrentPlay()
+                onContinuousHeartbeatCallback?.accept(state)
                 delay(interval)
             }
         }
-    }
-
-    override fun setOnFirstHeartbeatReceived(callback: (DeviceLimitState) -> Unit) {
-        onFirstHeartbeatReceived = callback
-    }
-
-    override fun setOnContinuousHeartbeatReceived(callback: (DeviceLimitState) -> Unit) {
-        onContinuousHeartbeatReceived = callback
-    }
-
-    override fun start() {
-        startHeartBeat()
     }
 
     override fun stop() {
         coroutineScope.cancel()
         heartbeatJob?.cancel()
         heartbeatJob = null
+        onStopHeartbeatCallback?.run()
     }
 }

@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import id.visionplus.coresdk.VisionPlusCore
 import id.visionplus.coresdk.features.device.DeviceManager
-import id.visionplus.coresdk.features.device.model.DeviceLimitState
+import id.visionplus.coresdk.features.device.model.ConcurrentPlayState
 import id.visionplus.videocore.ui.theme.VideoCoreTheme
 import java.net.SocketException
 
@@ -23,19 +23,20 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        VisionPlusCore.updateToken("")
+        VisionPlusCore.updateToken("USER TOKEN")
 
         coreDeviceManager = VisionPlusCore.getDeviceManager()
 
-        coreDeviceManager?.setOnFirstHeartbeatReceived { state ->
+        coreDeviceManager?.setOnFirstHeartbeatCallback { state ->
             when (state) {
-                is DeviceLimitState.Ok -> {
-                    // Device Limit Ok, user can proceed or play the video
+                is ConcurrentPlayState.Ok -> {
+                    // Concurrent Play Ok, user can proceed or play the video
                 }
-                is DeviceLimitState.Exceeded -> {
-                    // Device limit exceeded, may prompt user about that
+                is ConcurrentPlayState.DeviceLimitExceeded -> {
+                    // Concurrent Play exceeded, may prompt user about that
+                    // and call coreDeviceManager?.stop() if needed
                 }
-                is DeviceLimitState.Exception -> {
+                is ConcurrentPlayState.Exception -> {
                     if (state.exception is SocketException) {
                         // socket exception happen, please do something or leave it empty to do nothing
                     }
@@ -45,15 +46,16 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        coreDeviceManager?.setOnContinuousHeartbeatReceived { state ->
+        coreDeviceManager?.setOnContinuousHeartbeatCallback { state ->
             when (state) {
-                is DeviceLimitState.Ok -> {
-                    // Device Limit Ok, user can proceed or continue playing the video, or leave it empty to do nothing
+                is ConcurrentPlayState.Ok -> {
+                    // Concurrent Play Ok, user can proceed or continue playing the video, or leave it empty to do nothing
                 }
-                is DeviceLimitState.Exceeded -> {
-                    // Device limit exceeded, may prompt user about that
+                is ConcurrentPlayState.DeviceLimitExceeded -> {
+                    // Concurrent Play exceeded, may prompt user about that
+                    // and call coreDeviceManager?.stop() if needed
                 }
-                is DeviceLimitState.Exception -> {
+                is ConcurrentPlayState.Exception -> {
                     if (state.exception is SocketException) {
                         // socket exception happen, please do something or leave it empty to do nothing
                     }
@@ -61,6 +63,10 @@ class MainActivity : ComponentActivity() {
                     // another exception checking, or just leave it empty to do nothing
                 }
             }
+        }
+
+        coreDeviceManager?.setOnStopHeartbeatCallback {
+            // stop player here
         }
 
         coreDeviceManager?.start()

@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class DeviceLimitResponse (
+internal data class ConcurrentPlayResponse (
     @SerialName("user_type")
     val userType: String?,
     @SerialName("max_play")

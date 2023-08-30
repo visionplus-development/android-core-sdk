@@ -1,8 +1,8 @@
 package id.visionplus.coresdk.utils.logger
 
 import android.util.Log
-import id.visionplus.coresdk.DEBUG
 
+internal var DEBUG = false
 internal object Logger {
 
     fun debug(message: String) {

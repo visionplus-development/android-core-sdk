@@ -7,9 +7,7 @@ import id.visionplus.coresdk.features.config.model.GlobalConfig
 import id.visionplus.coresdk.features.device.DeviceManager
 import id.visionplus.coresdk.features.device.DeviceManagerImpl
 import id.visionplus.coresdk.features.device.repository.DeviceRepository
-
-internal var DEBUG = false
-
+import id.visionplus.coresdk.utils.logger.DEBUG
 
 object VisionPlusCore {
 

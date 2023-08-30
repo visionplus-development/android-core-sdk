@@ -1,20 +1,28 @@
 package id.visionplus.coresdk.features.device
 
-import id.visionplus.coresdk.features.device.model.DeviceLimitState
+import androidx.core.util.Consumer
+import id.visionplus.coresdk.features.device.model.ConcurrentPlayState
+import kotlinx.coroutines.Runnable
 
 interface DeviceManager {
     /**
-     * setOnFirstHeartbeatReceived triggered only for once after calling start()
+     * setOnFirstHeartbeatCallback triggered only for once after calling start()
      * and give you first response of heartbeat chain
      * */
-    fun setOnFirstHeartbeatReceived(callback: (DeviceLimitState) -> Unit)
+    fun setOnFirstHeartbeatCallback(callback: Consumer<ConcurrentPlayState>)
 
     /**
-     * setOnContinuousHeartbeatReceived triggered after the first response,
-     * and continue give you response of heartbeat chain every interval time
-     * as long as you dont call stop() or instance get killed
+     * setOnContinuousHeartbeatCallback triggered after the first response,
+     * and continues to provide responses of the heartbeat chain at regular intervals,
+     * as long as you don't call stop() or the instance gets killed.
+     * The interval is determined by the CoreModuleConfig.Device.
      * */
-    fun setOnContinuousHeartbeatReceived(callback: (DeviceLimitState) -> Unit)
+    fun setOnContinuousHeartbeatCallback(callback: Consumer<ConcurrentPlayState>)
+
+    /**
+     * setOnStopHeartbeatCallback triggered only for once after calling stop()
+     * */
+    fun setOnStopHeartbeatCallback(callback: Runnable)
 
     /**
      * Start the heartbeat
