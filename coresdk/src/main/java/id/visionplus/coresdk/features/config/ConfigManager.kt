@@ -2,8 +2,8 @@ package id.visionplus.coresdk.features.config
 
 import android.annotation.SuppressLint
 import android.content.Context
-import id.visionplus.coresdk.features.config.model.Config
-import id.visionplus.coresdk.features.config.model.CoreModule
+import id.visionplus.coresdk.features.config.model.CoreModuleConfig
+import id.visionplus.coresdk.features.config.model.GlobalConfig
 
 internal class ConfigManager(context: Context) {
 
@@ -23,28 +23,40 @@ internal class ConfigManager(context: Context) {
     val deviceId: String
         get() = prefs.getString(DEVICE_ID, "").orEmpty()
 
-    fun getDeviceConfig(): CoreModule.Device {
-        return CoreModule.Device(
+    fun getDeviceConfig(): CoreModuleConfig.Device {
+        return CoreModuleConfig.Device(
             heartbeatIntervalMs = prefs.getLong(MODULE_DEVICE_HEARTBEAT_INTERVAL, 60000),
             url = prefs.getString(MODULE_DEVICE_URL, "").orEmpty()
         )
     }
 
-    fun saveConfig(config: Config) {
+    fun saveCoreModuleConfigs(configs: List<CoreModuleConfig>) {
+        configs.forEach { config ->
+            if (config is CoreModuleConfig.Device) {
+                prefs.edit()
+                    .putString(MODULE_DEVICE_URL, config.url)
+                    .putLong(MODULE_DEVICE_HEARTBEAT_INTERVAL, config.heartbeatIntervalMs)
+                    .apply()
+            }
+        }
+    }
 
+    fun saveCoreModuleConfig(config: CoreModuleConfig) {
+        when (config) {
+            is CoreModuleConfig.Device -> {
+                prefs.edit()
+                    .putString(MODULE_DEVICE_URL, config.url)
+                    .putLong(MODULE_DEVICE_HEARTBEAT_INTERVAL, config.heartbeatIntervalMs)
+                    .apply()
+            }
+        }
+    }
+
+    fun saveGlobalConfig(config: GlobalConfig) {
         prefs.edit()
             .putString(TOKEN, config.token)
             .putString(DEVICE_ID, config.deviceId)
             .apply()
-
-        config.modules.forEach {
-            if (it is CoreModule.Device) {
-                prefs.edit()
-                    .putString(MODULE_DEVICE_URL, it.url)
-                    .putLong(MODULE_DEVICE_HEARTBEAT_INTERVAL, it.heartbeatIntervalMs)
-                    .apply()
-            }
-        }
     }
 
     /**

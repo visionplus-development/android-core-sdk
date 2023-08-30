@@ -11,8 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import id.visionplus.coresdk.VisionPlusCore
-import id.visionplus.coresdk.features.config.model.Config
-import id.visionplus.coresdk.features.config.model.CoreModule
 import id.visionplus.coresdk.features.device.DeviceManager
 import id.visionplus.coresdk.features.device.model.DeviceLimitState
 import id.visionplus.videocore.ui.theme.VideoCoreTheme

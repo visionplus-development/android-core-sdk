@@ -2,7 +2,8 @@ package id.visionplus.coresdk
 
 import android.content.Context
 import id.visionplus.coresdk.features.config.ConfigManager
-import id.visionplus.coresdk.features.config.model.Config
+import id.visionplus.coresdk.features.config.model.CoreModuleConfig
+import id.visionplus.coresdk.features.config.model.GlobalConfig
 import id.visionplus.coresdk.features.device.DeviceManager
 import id.visionplus.coresdk.features.device.DeviceManagerImpl
 import id.visionplus.coresdk.features.device.repository.DeviceRepository
@@ -12,8 +13,16 @@ internal var DEBUG = false
 
 object VisionPlusCore {
 
-    fun setConfig(context: Context, config: Config) {
-        ConfigManager(context).saveConfig(config)
+    fun setGlobalConfig(context: Context, config: GlobalConfig) {
+        ConfigManager(context).saveGlobalConfig(config)
+    }
+
+    fun setCoreModuleConfigs(context: Context, configs: List<CoreModuleConfig>) {
+        ConfigManager(context).saveCoreModuleConfigs(configs)
+    }
+
+    fun setCoreModuleConfig(context: Context, config: CoreModuleConfig) {
+        ConfigManager(context).saveCoreModuleConfig(config)
     }
 
     fun updateToken(context: Context, token: String) {

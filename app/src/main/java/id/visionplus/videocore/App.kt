@@ -2,8 +2,8 @@ package id.visionplus.videocore
 
 import android.app.Application
 import id.visionplus.coresdk.VisionPlusCore
-import id.visionplus.coresdk.features.config.model.Config
-import id.visionplus.coresdk.features.config.model.CoreModule
+import id.visionplus.coresdk.features.config.model.GlobalConfig
+import id.visionplus.coresdk.features.config.model.CoreModuleConfig
 
 class App: Application() {
     override fun onCreate() {
@@ -16,23 +16,27 @@ class App: Application() {
             VisionPlusCore.enableDebugMode()
         }
 
-        val deviceModule = CoreModule.Device(
-            heartbeatIntervalMs = 5000, // 5 sec
-            url = "" // full url
+        /*
+        * it is not required to define this config in .App
+        * we can also define it anywhere
+        * */
+        VisionPlusCore.setCoreModuleConfig(
+            context = this,
+            config = CoreModuleConfig.Device(
+                heartbeatIntervalMs = 5000, // 5 sec
+                url = "" // full url
+            )
         )
 
         /*
         * it is not required to define this config in .App
         * we can also define it anywhere
         * */
-        VisionPlusCore.setConfig(
+        VisionPlusCore.setGlobalConfig(
             context = this,
-            config = Config(
+            config = GlobalConfig(
                 deviceId = "", // required
                 token = "", // we can define token later
-                modules = listOf(
-                    deviceModule
-                )
             )
         )
     }
