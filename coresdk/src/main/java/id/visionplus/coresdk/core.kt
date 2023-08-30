@@ -91,7 +91,7 @@ class CoreVideo(
         runHeartbeatEveryN()
     }
 }
-@Deprecated(message = "Not being maintained anymore", replaceWith = ReplaceWith("id.visionplus.coresdk.features.device.model.response.DeviceLimitResponse"), level = DeprecationLevel.WARNING)
+@Deprecated(message = "Not being maintained anymore", replaceWith = ReplaceWith("id.visionplus.coresdk.features.device.model.response.ConcurrentPlayResponse"), level = DeprecationLevel.WARNING)
 @Serializable
 data class UserData(
     @SerialName("user_type")

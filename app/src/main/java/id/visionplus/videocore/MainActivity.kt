@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import id.visionplus.coresdk.VisionPlusCore
 import id.visionplus.coresdk.features.device.DeviceManager
-import id.visionplus.coresdk.features.device.model.DeviceLimitState
+import id.visionplus.coresdk.features.device.model.ConcurrentPlayState
 import id.visionplus.videocore.ui.theme.VideoCoreTheme
 import java.net.SocketException
 
@@ -23,19 +23,19 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        VisionPlusCore.updateToken("")
+        VisionPlusCore.updateToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaG1hZC5odWRhQHZpc2lvbnBsdXMuaWQiLCJhYmlsaXRpZXMiOltdLCJ1aWQiOjY5MTIyNzQxLCJyYW5kb20iOiJmMjNlZGMzNjdjYjE1MTNlIiwiZXhwIjoxNjk1ODgzODQ4LCJwbCI6ImFuZHJvaWQiLCJkZXZpY2VfaWQiOiIzOGMzMDlkYmIxNzUzMzNmOGY0N2E3OGZjMjMxN2RjNSJ9.7mkURo3I5MoaKd76dCpilnhU1BshB-lPeESZoanbOdU ")
 
         coreDeviceManager = VisionPlusCore.getDeviceManager()
 
         coreDeviceManager?.setOnFirstHeartbeatReceived { state ->
             when (state) {
-                is DeviceLimitState.Ok -> {
+                is ConcurrentPlayState.Ok -> {
                     // Device Limit Ok, user can proceed or play the video
                 }
-                is DeviceLimitState.Exceeded -> {
+                is ConcurrentPlayState.DeviceLimitExceeded -> {
                     // Device limit exceeded, may prompt user about that
                 }
-                is DeviceLimitState.Exception -> {
+                is ConcurrentPlayState.Exception -> {
                     if (state.exception is SocketException) {
                         // socket exception happen, please do something or leave it empty to do nothing
                     }
@@ -47,13 +47,13 @@ class MainActivity : ComponentActivity() {
 
         coreDeviceManager?.setOnContinuousHeartbeatReceived { state ->
             when (state) {
-                is DeviceLimitState.Ok -> {
+                is ConcurrentPlayState.Ok -> {
                     // Device Limit Ok, user can proceed or continue playing the video, or leave it empty to do nothing
                 }
-                is DeviceLimitState.Exceeded -> {
+                is ConcurrentPlayState.DeviceLimitExceeded -> {
                     // Device limit exceeded, may prompt user about that
                 }
-                is DeviceLimitState.Exception -> {
+                is ConcurrentPlayState.Exception -> {
                     if (state.exception is SocketException) {
                         // socket exception happen, please do something or leave it empty to do nothing
                     }
