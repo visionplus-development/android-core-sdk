@@ -22,6 +22,9 @@ dependencies {
 ### Step 3. Usage
 #### Config
 ```kotlin
+        // init sdk on .Application
+        VisionPlusCore.init(this) // required
+
         // enable debug
         if (BuildConfig.DEBUG) {
             VisionPlusCore.enableDebugMode()
@@ -29,8 +32,7 @@ dependencies {
 
         // Global config
         VisionPlusCore.setGlobalConfig(
-            context = this,
-            config = GlobalConfig(
+            GlobalConfig(
                 deviceId = "DEVICE ID", // required
                 token = "USER TOKEN", // we can define token later
             )
@@ -38,8 +40,7 @@ dependencies {
 
         // Module config: Device Limit
         VisionPlusCore.setCoreModuleConfig(
-            context = this,
-            config = CoreModuleConfig.Device(
+            CoreModuleConfig.Device(
                 heartbeatIntervalMs = 5000, // in milliss
                 url = "URL" // full url
             )
@@ -51,7 +52,7 @@ dependencies {
 
 #### Preparation
 ```kotlin
-val coreDeviceManager = VisionPlusCore.getDeviceManager(this)
+val coreDeviceManager = VisionPlusCore.getDeviceManager()
 
 coreDeviceManager.setOnFirstHeartbeatReceived { state ->
     when (state) {
