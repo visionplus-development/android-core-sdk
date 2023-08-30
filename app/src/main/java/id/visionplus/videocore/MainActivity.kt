@@ -10,49 +10,61 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import id.visionplus.coresdk.CoreVideo
-import id.visionplus.coresdk.CoreVideoListener
+import id.visionplus.coresdk.VisionPlusCore
+import id.visionplus.coresdk.features.device.DeviceManager
+import id.visionplus.coresdk.features.device.model.DeviceLimitState
 import id.visionplus.videocore.ui.theme.VideoCoreTheme
+import java.net.SocketException
 
 class MainActivity : ComponentActivity() {
-    lateinit var c: CoreVideo
+
+    private var coreDeviceManager: DeviceManager? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        c = CoreVideo(
-            token = "",
-            deviceID = "",
-            intervalInSecond = 60,
-            isDebug = false,
-            limitedDeviceBaseUrl = ""
-        )
 
+        VisionPlusCore.updateToken("")
 
-        c.listener = object : CoreVideoListener {
-            override fun onFirstHeartbeatReceived(code: Int, message: String) {
-                when (code) {
-                    403 -> {
-                        // tendang user
-                    }
-                    else -> {
-                        // play player
-                    }
+        coreDeviceManager = VisionPlusCore.getDeviceManager()
+
+        coreDeviceManager?.setOnFirstHeartbeatReceived { state ->
+            when (state) {
+                is DeviceLimitState.Ok -> {
+                    // Device Limit Ok, user can proceed or play the video
                 }
-            }
+                is DeviceLimitState.Exceeded -> {
+                    // Device limit exceeded, may prompt user about that
+                }
+                is DeviceLimitState.Exception -> {
+                    if (state.exception is SocketException) {
+                        // socket exception happen, please do something or leave it empty to do nothing
+                    }
 
-            override fun onHeartbeatReceived(code: Int, message: String) {
-                when (code) {
-                    403 -> {
-                        // tendang user
-                    }
-                    else -> {
-                        // do nothing
-                    }
+                    // another exception checking, or just leave it empty to do nothing
                 }
             }
         }
 
-        c.start()
-        c.stop()
+        coreDeviceManager?.setOnContinuousHeartbeatReceived { state ->
+            when (state) {
+                is DeviceLimitState.Ok -> {
+                    // Device Limit Ok, user can proceed or continue playing the video, or leave it empty to do nothing
+                }
+                is DeviceLimitState.Exceeded -> {
+                    // Device limit exceeded, may prompt user about that
+                }
+                is DeviceLimitState.Exception -> {
+                    if (state.exception is SocketException) {
+                        // socket exception happen, please do something or leave it empty to do nothing
+                    }
+
+                    // another exception checking, or just leave it empty to do nothing
+                }
+            }
+        }
+
+        coreDeviceManager?.start()
+
 
         setContent {
             VideoCoreTheme {
@@ -69,7 +81,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        c.stop()
+        coreDeviceManager?.stop()
     }
 }
 

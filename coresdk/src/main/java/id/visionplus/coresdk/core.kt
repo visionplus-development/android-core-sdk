@@ -12,11 +12,13 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@Deprecated(message = "Not being maintained anymore", replaceWith = ReplaceWith(""), level = DeprecationLevel.WARNING)
 interface CoreVideoListener {
     fun onFirstHeartbeatReceived(code: Int, message: String) // success: start player, failure: show message limit
     fun onHeartbeatReceived(code: Int, message: String) // success: do nothing, failure: show message limit
 }
 
+@Deprecated(message = "Not being maintained anymore", replaceWith = ReplaceWith(""), level = DeprecationLevel.WARNING)
 class CoreVideo(
     var token: String = "",
     var deviceID: String = "",
@@ -89,7 +91,7 @@ class CoreVideo(
         runHeartbeatEveryN()
     }
 }
-
+@Deprecated(message = "Not being maintained anymore", replaceWith = ReplaceWith("id.visionplus.coresdk.features.device.model.response.DeviceLimitResponse"), level = DeprecationLevel.WARNING)
 @Serializable
 data class UserData(
     @SerialName("user_type")
@@ -98,6 +100,7 @@ data class UserData(
     val maxPlay: Int?
 )
 
+@Deprecated(message = "Not being maintained anymore", replaceWith = ReplaceWith("id.visionplus.coresdk.utils.network.model.ApiResponse"), level = DeprecationLevel.WARNING)
 @Serializable
 data class ApiResponse(
     @SerialName("data")
