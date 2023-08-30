@@ -1,5 +1,6 @@
 package id.visionplus.coresdk.features.device.repository
 
+import id.visionplus.coresdk.DEBUG
 import id.visionplus.coresdk.features.config.ConfigManager
 import id.visionplus.coresdk.features.device.model.DeviceLimitState
 import id.visionplus.coresdk.features.device.model.response.DeviceLimitResponse
@@ -11,6 +12,7 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.android.*
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -26,6 +28,10 @@ internal class DeviceRepository(
     }
 
     private val client = HttpClient(Android) {
+        if (DEBUG) {
+            install(Logging)
+        }
+
         install(ContentNegotiation) {
             json()
         }
@@ -57,7 +63,7 @@ internal class DeviceRepository(
 
             val errorBody: String = response.bodyAsText()
             val errorResponse = Json.decodeFromString(ApiResponse.serializer(DeviceLimitResponse.serializer()), errorBody)
-
+            Logger.debug(TAG, "reportLimitedDevice: $errorBody")
             return when (response.status) {
                 HttpStatusCode.Forbidden -> {
                     DeviceLimitState.Exceeded(errorResponse.message.orGeneraError())
