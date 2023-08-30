@@ -22,47 +22,48 @@ dependencies {
 ### Step 3. Usage
 #### Config
 ```kotlin
-        // init sdk on .Application
-        VisionPlusCore.init(this) // required
+// init sdk on .Application
+VisionPlusCore.init(this) // required
 
-        // enable debug
-        if (BuildConfig.DEBUG) {
-            VisionPlusCore.enableDebugMode()
-        }
+// enable debug
+if (BuildConfig.DEBUG) {
+    VisionPlusCore.enableDebugMode()
+}
 
-        // Global config
-        VisionPlusCore.setGlobalConfig(
-            GlobalConfig(
-                deviceId = "DEVICE ID", // required
-                token = "USER TOKEN", // we can define token later
-            )
-        )
+// Global config
+VisionPlusCore.setGlobalConfig(
+    GlobalConfig(
+        deviceId = "DEVICE ID", // required
+        token = "USER TOKEN", // we can define token later
+    )
+)
 
-        // Module config: Device Limit
-        VisionPlusCore.setCoreModuleConfig(
-            CoreModuleConfig.Device(
-                heartbeatIntervalMs = 5000, // in milliss
-                url = "URL" // full url
-            )
-        )
+// Module config: Device Limit
+VisionPlusCore.setCoreModuleConfig(
+    CoreModuleConfig.Device(
+        heartbeatIntervalMs = 5000, // in milliss
+        url = "URL" // full url
+    )
+)
 
         // Update token
-        VisionPlusCore.updateToken("USER TOKEN") // we can update token like this
+VisionPlusCore.updateToken("USER TOKEN") // we can update token like this
 ```
 
 #### Preparation
 ```kotlin
 val coreDeviceManager = VisionPlusCore.getDeviceManager()
 
-coreDeviceManager.setOnFirstHeartbeatReceived { state ->
+coreDeviceManager?.setOnFirstHeartbeatCallback { state ->
     when (state) {
-        is DeviceLimitState.Ok -> {
+        is ConcurrentPlayState.Ok -> {
             // Device Limit Ok, user can proceed or play the video
         }
-        is DeviceLimitState.Exceeded -> {
+        is ConcurrentPlayState.DeviceLimitExceeded -> {
             // Device limit exceeded, may prompt user about that
+            // and call coreDeviceManager?.stop() if needed
         }
-        is DeviceLimitState.Exception -> {
+        is ConcurrentPlayState.Exception -> {
             if (state.exception is SocketException) {
                 // socket exception happen, please do something or leave it empty to do nothing
             }
@@ -72,15 +73,16 @@ coreDeviceManager.setOnFirstHeartbeatReceived { state ->
     }
 }
 
-coreDeviceManager.setOnContinuousHeartbeatReceived { state ->
+coreDeviceManager?.setOnContinuousHeartbeatCallback { state ->
     when (state) {
-        is DeviceLimitState.Ok -> {
+        is ConcurrentPlayState.Ok -> {
             // Device Limit Ok, user can proceed or continue playing the video, or leave it empty to do nothing
         }
-        is DeviceLimitState.Exceeded -> {
+        is ConcurrentPlayState.DeviceLimitExceeded -> {
             // Device limit exceeded, may prompt user about that
+            // and call coreDeviceManager?.stop() if needed
         }
-        is DeviceLimitState.Exception -> {
+        is ConcurrentPlayState.Exception -> {
             if (state.exception is SocketException) {
                 // socket exception happen, please do something or leave it empty to do nothing
             }
@@ -88,6 +90,10 @@ coreDeviceManager.setOnContinuousHeartbeatReceived { state ->
             // another exception checking, or just leave it empty to do nothing
         }
     }
+}
+
+coreDeviceManager?.setOnStopHeartbeatCallback {
+    // stop player here
 }
 
 ```
