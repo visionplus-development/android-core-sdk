@@ -30,10 +30,10 @@ class MainActivity : ComponentActivity() {
         coreDeviceManager?.setOnFirstHeartbeatCallback { state ->
             when (state) {
                 is ConcurrentPlayState.Ok -> {
-                    // Device Limit Ok, user can proceed or play the video
+                    // Concurrent Play Ok, user can proceed or play the video
                 }
                 is ConcurrentPlayState.DeviceLimitExceeded -> {
-                    // Device limit exceeded, may prompt user about that
+                    // Concurrent Play exceeded, may prompt user about that
                     // and call coreDeviceManager?.stop() if needed
                 }
                 is ConcurrentPlayState.Exception -> {
@@ -49,10 +49,10 @@ class MainActivity : ComponentActivity() {
         coreDeviceManager?.setOnContinuousHeartbeatCallback { state ->
             when (state) {
                 is ConcurrentPlayState.Ok -> {
-                    // Device Limit Ok, user can proceed or continue playing the video, or leave it empty to do nothing
+                    // Concurrent Play Ok, user can proceed or continue playing the video, or leave it empty to do nothing
                 }
                 is ConcurrentPlayState.DeviceLimitExceeded -> {
-                    // Device limit exceeded, may prompt user about that
+                    // Concurrent Play exceeded, may prompt user about that
                     // and call coreDeviceManager?.stop() if needed
                 }
                 is ConcurrentPlayState.Exception -> {

@@ -5,17 +5,17 @@
 Add it in your build.gradle (root) at the end of repositories:
 ```groovy
 allprojects {
-	repositories {
-		...
-		maven { url 'https://jitpack.io' }
-	}
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
 }
 ```
 ### Step 2. Add the dependency
 Add it in your build.gradle (app):
 ```groovy
 dependencies {
-	implementation 'com.github.visionplus-development:android-core-sdk:$latest_version'
+    implementation 'com.github.visionplus-development:android-core-sdk:$latest_version'
 }
 ```
 
@@ -46,7 +46,7 @@ VisionPlusCore.setCoreModuleConfig(
     )
 )
 
-        // Update token
+// Update token
 VisionPlusCore.updateToken("USER TOKEN") // we can update token like this
 ```
 
@@ -54,13 +54,13 @@ VisionPlusCore.updateToken("USER TOKEN") // we can update token like this
 ```kotlin
 val coreDeviceManager = VisionPlusCore.getDeviceManager()
 
-coreDeviceManager?.setOnFirstHeartbeatCallback { state ->
+coreDeviceManager.setOnFirstHeartbeatCallback { state ->
     when (state) {
         is ConcurrentPlayState.Ok -> {
-            // Device Limit Ok, user can proceed or play the video
+            // Concurrent Play Ok, user can proceed or play the video
         }
         is ConcurrentPlayState.DeviceLimitExceeded -> {
-            // Device limit exceeded, may prompt user about that
+            // Concurrent Play exceeded, may prompt user about that
             // and call coreDeviceManager?.stop() if needed
         }
         is ConcurrentPlayState.Exception -> {
@@ -73,13 +73,13 @@ coreDeviceManager?.setOnFirstHeartbeatCallback { state ->
     }
 }
 
-coreDeviceManager?.setOnContinuousHeartbeatCallback { state ->
+coreDeviceManager.setOnContinuousHeartbeatCallback { state ->
     when (state) {
         is ConcurrentPlayState.Ok -> {
-            // Device Limit Ok, user can proceed or continue playing the video, or leave it empty to do nothing
+            // Concurrent Play Ok, user can proceed or continue playing the video, or leave it empty to do nothing
         }
         is ConcurrentPlayState.DeviceLimitExceeded -> {
-            // Device limit exceeded, may prompt user about that
+            // Concurrent Play exceeded, may prompt user about that
             // and call coreDeviceManager?.stop() if needed
         }
         is ConcurrentPlayState.Exception -> {
@@ -92,7 +92,7 @@ coreDeviceManager?.setOnContinuousHeartbeatCallback { state ->
     }
 }
 
-coreDeviceManager?.setOnStopHeartbeatCallback {
+coreDeviceManager.setOnStopHeartbeatCallback {
     // stop player here
 }
 
