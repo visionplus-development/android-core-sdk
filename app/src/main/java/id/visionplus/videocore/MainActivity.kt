@@ -27,13 +27,14 @@ class MainActivity : ComponentActivity() {
 
         coreDeviceManager = VisionPlusCore.getDeviceManager()
 
-        coreDeviceManager?.setOnFirstHeartbeatReceived { state ->
+        coreDeviceManager?.setOnFirstHeartbeatCallback { state ->
             when (state) {
                 is ConcurrentPlayState.Ok -> {
                     // Device Limit Ok, user can proceed or play the video
                 }
                 is ConcurrentPlayState.DeviceLimitExceeded -> {
                     // Device limit exceeded, may prompt user about that
+                    // and call coreDeviceManager?.stop() if needed
                 }
                 is ConcurrentPlayState.Exception -> {
                     if (state.exception is SocketException) {
@@ -45,13 +46,14 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        coreDeviceManager?.setOnContinuousHeartbeatReceived { state ->
+        coreDeviceManager?.setOnContinuousHeartbeatCallback { state ->
             when (state) {
                 is ConcurrentPlayState.Ok -> {
                     // Device Limit Ok, user can proceed or continue playing the video, or leave it empty to do nothing
                 }
                 is ConcurrentPlayState.DeviceLimitExceeded -> {
                     // Device limit exceeded, may prompt user about that
+                    // and call coreDeviceManager?.stop() if needed
                 }
                 is ConcurrentPlayState.Exception -> {
                     if (state.exception is SocketException) {
@@ -61,6 +63,10 @@ class MainActivity : ComponentActivity() {
                     // another exception checking, or just leave it empty to do nothing
                 }
             }
+        }
+
+        coreDeviceManager?.setOnStopHeartbeatCallback {
+            // stop player here
         }
 
         coreDeviceManager?.start()
