@@ -23,9 +23,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        VisionPlusCore.updateToken(this, "")
+        VisionPlusCore.updateToken("")
 
-        coreDeviceManager = VisionPlusCore.getDeviceManager(this)
+        coreDeviceManager = VisionPlusCore.getDeviceManager()
 
         coreDeviceManager?.setOnFirstHeartbeatReceived { state ->
             when (state) {

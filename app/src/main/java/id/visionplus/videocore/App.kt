@@ -12,17 +12,20 @@ class App: Application() {
     }
 
     private fun setupVisionPlusCoreSdk() {
+
+
         if (BuildConfig.DEBUG) {
             VisionPlusCore.enableDebugMode()
         }
+
+        VisionPlusCore.init(this)
 
         /*
         * it is not required to define this config in .App
         * we can also define it anywhere
         * */
         VisionPlusCore.setCoreModuleConfig(
-            context = this,
-            config = CoreModuleConfig.Device(
+            CoreModuleConfig.Device(
                 heartbeatIntervalMs = 5000, // 5 sec
                 url = "" // full url
             )
@@ -33,7 +36,6 @@ class App: Application() {
         * we can also define it anywhere
         * */
         VisionPlusCore.setGlobalConfig(
-            context = this,
             config = GlobalConfig(
                 deviceId = "", // required
                 token = "", // we can define token later

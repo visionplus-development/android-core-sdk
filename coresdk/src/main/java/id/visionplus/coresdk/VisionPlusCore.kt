@@ -13,31 +13,41 @@ internal var DEBUG = false
 
 object VisionPlusCore {
 
-    fun setGlobalConfig(context: Context, config: GlobalConfig) {
-        ConfigManager(context).saveGlobalConfig(config)
-    }
+    private var configManager: ConfigManager? = null
 
-    fun setCoreModuleConfigs(context: Context, configs: List<CoreModuleConfig>) {
-        ConfigManager(context).saveCoreModuleConfigs(configs)
-    }
-
-    fun setCoreModuleConfig(context: Context, config: CoreModuleConfig) {
-        ConfigManager(context).saveCoreModuleConfig(config)
-    }
-
-    fun updateToken(context: Context, token: String) {
-        ConfigManager(context).updateToken(token)
+    fun init(context: Context) {
+        if (configManager == null) {
+            configManager = ConfigManager(context)
+        }
     }
 
     fun enableDebugMode() {
         DEBUG = true
     }
 
-    fun getDeviceManager(context: Context): DeviceManager {
-        val configManager = ConfigManager(context)
-        return DeviceManagerImpl(
-            configManager = ConfigManager(context),
-            repository = DeviceRepository(configManager)
-        )
+    fun setGlobalConfig(config: GlobalConfig) {
+        configManager?.saveGlobalConfig(config) ?: throw IllegalStateException("Call VisionPlusCore.init() first!")
+    }
+
+    fun setCoreModuleConfigs(configs: List<CoreModuleConfig>) {
+        configManager?.saveCoreModuleConfigs(configs) ?: throw IllegalStateException("Call VisionPlusCore.init() first!")
+    }
+
+    fun setCoreModuleConfig(config: CoreModuleConfig) {
+        configManager?.saveCoreModuleConfig(config) ?: throw IllegalStateException("Call VisionPlusCore.init() first!")
+    }
+
+    fun updateToken(token: String) {
+        configManager?.updateToken(token) ?: throw IllegalStateException("Call VisionPlusCore.init() first!")
+    }
+
+
+    fun getDeviceManager(): DeviceManager {
+        configManager?.let {
+            return DeviceManagerImpl(
+                configManager = it,
+                repository = DeviceRepository(it)
+            )
+        } ?: throw IllegalStateException("Call VisionPlusCore.init() first!")
     }
 }
