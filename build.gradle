@@ -11,8 +11,8 @@ allprojects {
     apply plugin: 'maven-publish'
 
     project.ext {
-        appVersionString = "0.10.0" //String
-        appVersionCode = 10 //Integer
+        appVersionString = "0.10.1" //String
+        appVersionCode = 11 //Integer
     }
 
     ext {
