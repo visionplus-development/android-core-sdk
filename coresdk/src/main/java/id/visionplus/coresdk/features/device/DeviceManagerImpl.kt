@@ -31,7 +31,7 @@ internal class DeviceManagerImpl(
     }
 
     override fun start() {
-        if (heartbeatJob != null) {
+        if (heartbeatJob?.isActive == true) {
             return
         }
 
@@ -53,9 +53,7 @@ internal class DeviceManagerImpl(
     }
 
     override fun stop() {
-        coroutineScope.cancel()
         heartbeatJob?.cancel()
-        heartbeatJob = null
         onStopHeartbeatCallback?.run()
     }
 }

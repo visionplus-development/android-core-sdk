@@ -36,7 +36,7 @@ class App: Application() {
         * */
         VisionPlusCore.setGlobalConfig(
             config = GlobalConfig(
-                deviceId = "DEVICE ID", // required
+                deviceId = "DEVICE_ID", // required
                 token = "", // we can define token later
             )
         )
