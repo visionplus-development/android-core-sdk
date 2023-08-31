@@ -1,9 +1,13 @@
 package id.visionplus.videocore
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -18,12 +22,16 @@ import java.net.SocketException
 
 class MainActivity : ComponentActivity() {
 
+    companion object {
+        private const val TAG = "VisionPlusCore"
+    }
+
     private var coreDeviceManager: DeviceManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        VisionPlusCore.updateToken("USER TOKEN")
+        VisionPlusCore.updateToken("USER_TOKEN")
 
         coreDeviceManager = VisionPlusCore.getDeviceManager()
 
@@ -31,10 +39,13 @@ class MainActivity : ComponentActivity() {
             when (state) {
                 is ConcurrentPlayState.Ok -> {
                     // Concurrent Play Ok, user can proceed or play the video
+                    Log.d(TAG, "onCreate: first heartbeat received - ok")
                 }
                 is ConcurrentPlayState.DeviceLimitExceeded -> {
                     // Concurrent Play exceeded, may prompt user about that
                     // and call coreDeviceManager?.stop() if needed
+                    Log.d(TAG, "onCreate: first heartbeat received - device limit")
+                    coreDeviceManager?.stop()
                 }
                 is ConcurrentPlayState.Exception -> {
                     if (state.exception is SocketException) {
@@ -42,6 +53,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     // another exception checking, or just leave it empty to do nothing
+                    Log.d(TAG, "onCreate: first heartbeat received - exception ${state.exception}")
                 }
             }
         }
@@ -50,10 +62,13 @@ class MainActivity : ComponentActivity() {
             when (state) {
                 is ConcurrentPlayState.Ok -> {
                     // Concurrent Play Ok, user can proceed or continue playing the video, or leave it empty to do nothing
+                    Log.d(TAG, "onCreate: continuous heartbeat received - ok")
                 }
                 is ConcurrentPlayState.DeviceLimitExceeded -> {
                     // Concurrent Play exceeded, may prompt user about that
                     // and call coreDeviceManager?.stop() if needed
+                    Log.d(TAG, "onCreate: continuous heartbeat received - device limit")
+                    coreDeviceManager?.stop()
                 }
                 is ConcurrentPlayState.Exception -> {
                     if (state.exception is SocketException) {
@@ -61,15 +76,15 @@ class MainActivity : ComponentActivity() {
                     }
 
                     // another exception checking, or just leave it empty to do nothing
+                    Log.d(TAG, "onCreate: continuous heartbeat received - exception ${state.exception}")
                 }
             }
         }
 
         coreDeviceManager?.setOnStopHeartbeatCallback {
             // stop player here
+            Log.d(TAG, "onCreate: heartbeat stop")
         }
-
-        coreDeviceManager?.start()
 
 
         setContent {
@@ -79,7 +94,21 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
+                    Column {
+                        Row {
+                            DefaultButton("start", onClick = {
+                                coreDeviceManager?.start()
+                                Log.d(TAG, "onCreate: heartbeat start")
+                            })
+                        }
+
+                        Row {
+                            DefaultButton("stop", onClick = {
+                                coreDeviceManager?.stop()
+                                Log.d(TAG, "onCreate: heartbeat stop")
+                            })
+                        }
+                    }
                 }
             }
         }
@@ -92,17 +121,19 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+fun DefaultButton(label: String, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
+    Button(onClick = onClick) {
+        Text(
+            text = label,
+            modifier = modifier
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     VideoCoreTheme {
-        Greeting("Android")
+        DefaultButton("Android")
     }
 }
